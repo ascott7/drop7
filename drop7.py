@@ -3,18 +3,19 @@ import time
 import sys,tty,termios
 import numpy as np
 
-class Board:
-    def __init__(self, sleep=False):
+class Game:
+    def __init__(self, sleep=False, print_board=True):
         # board[row][column], top row is row 6 and bottom row is row 0
         # 9 means we have an unbroken piece (O) and 8 means we have a partly broken piece (@)
         self.board = np.zeros((7, 7), dtype=np.int)#[[0 for x in range(7)] for y in range(7)]
         self.sleep = sleep
         self.level = 1
-        self.pieces_left = 1
+        self.pieces_left = 30
         self.current_piece = random.randint(1, 9)
         self.points = 0
         self.game_over = False
         self.overflow = np.zeros((7), dtype=np.int)
+        self.print_board = print_board
         """self.board[0][0] = 1
         self.board[1][0] = 2
         self.board[2][0] = 3
@@ -23,9 +24,9 @@ class Board:
         self.board[5][0] = 6"""
         self.board[0][0] = 5
         self.board[1][0] = 7
-        self.board[2][0] = 5
-        self.board[3][0] = 2
-        self.board[4][0] = 1
+        #self.board[2][0] = 5
+        self.board[2][0] = 2
+        self.board[3][0] = 1
         self.board[0][3] = 8
         self.board[0][5] = 9
 
@@ -59,27 +60,26 @@ class Board:
         # column is full
         if self.board[6][col] != 0:
             return False
-        print "PIECES LEFT IS", self.pieces_left
-        print "LEVEL IS", self.level
-        print "SCORE IS", self.points
         for j in range(0, 7):
             if self.board[j][col] == 0:
                 self.board[j][col] = self.current_piece
                 break
-        print self.__str__()
+        if self.print_board:
+            print self.__str__()
         if self.sleep:
             time.sleep(1)
         point_counter = self.chain_points()
         pieces_popped = self.pop_pieces()
         self.points += pieces_popped * point_counter.next()
         while pieces_popped > 0:
-            print self.__str__()
+            if self.print_board:
+                print self.__str__()
             if self.sleep:
                 time.sleep(1)
             pieces_popped = self.pop_pieces()
             self.points += pieces_popped * point_counter.next()
 
-        self.current_piece = random.randint(1, 9)
+        self.current_piece = random.choice([1, 2, 3, 4, 5, 6, 7, 9])
         self.pieces_left -= 1
         if self.pieces_left == 0:
             self.level_up()
@@ -90,10 +90,8 @@ class Board:
     def level_up(self):
         self.level += 1
         self.pieces_left = max(31 - self.level, 5)
-
+        self.points += 7000
         # first check if this will end the game
-        #if self.board.min(axis=1)[6] != 0:
-        #    self.game_over = True
         self.overflow = np.copy(self.board[6])
         if self.overflow.max() != 0:
             self.game_over = True
@@ -172,6 +170,8 @@ class Board:
     def __str__(self):
         board = '\n'
         board += "level: " + str(self.level)
+        board += "\npieces left this level: " + str(self.pieces_left)
+        board += "\nnext piece: " + str(self.current_piece)
         board += "\nscore: " + str(self.points) + "\n "
         for col in self.overflow:
             if col != 0 and col <= 7:
@@ -198,8 +198,7 @@ class Board:
             board += '|\n'
         # chop off the last newline
         return board[:-1]
-
-
+                
 # http://stackoverflow.com/questions/22397289/finding-the-values-of-the-arrow-keys-in-python-why-are-they-triples
 class _Getch:
     def __call__(self):
@@ -233,22 +232,22 @@ def get():
     
 if __name__ == "__main__":
 
-    b = Board(sleep=False)
+    g = Game(sleep=False, print_board=False)
     index = 0
-    print b
-    time.sleep(1)
-    b.place_piece(5)
-    time.sleep(1)
+    print g
+    #time.sleep(1)
+    #g.place_piece(5)
+    #time.sleep(1)
 
-    b.place_piece(3)
+    #g.place_piece(3)
 
-    while not b.game_over:
-        choices = b.available_cols()
+    while not g.game_over:
+        choices = g.available_cols()
         col = random.choice(choices)
         #time.sleep(1)
-        b.place_piece(col)
-        print b
-
+        g.place_piece(col)
+        #print g
+    print g
     #screen = curses.initscr()
     #screen.addstr("Hello World!!!")
     #screen.addstr(b.__str__())
@@ -289,4 +288,3 @@ if __name__ == "__main__":
         #while not b.place_piece(p, col):
         #    print 'can\'t use that column, try another'
             #col = input('column: ') - 1
-    
