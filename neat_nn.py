@@ -1,7 +1,7 @@
 from __future__ import print_function
 from neat import nn, population, visualize
 from drop7 import Game
-import random
+import random, pickle
 
 
 class Learner:
@@ -89,3 +89,10 @@ def naive_scores(iterations):
 if __name__ == "__main__":
     #print(naive_scores(100))
     l = Learner()
+    output = open('learner.pkl', 'wb')
+    pickle.dump(l, output)
+    output.close()
+
+    pkl_file = open('learner.pkl', 'rb')
+    learner = pickle.load(pkl_file)
+    pkl_file.close()
