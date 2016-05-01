@@ -165,6 +165,8 @@ class Game:
         # update the board if necessary
         if len(popped_pieces) > 0:
             self.board = new_board
+        if np.amax(self.board) == 0:
+            self.points += 70000
         return len(popped_pieces)
         
     def __str__(self):
