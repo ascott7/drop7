@@ -4,13 +4,19 @@ import sys,tty,termios
 import numpy as np
 
 class Game:
-    def __init__(self, sleep=False, print_board=True):
+    def __init__(self, sleep=False, print_board=True, classic_mode=True):
         # board[row][column], top row is row 6 and bottom row is row 0
         # 9 means we have an unbroken piece (O) and 8 means we have a partly broken piece (@)
         self.board = np.zeros((7, 7), dtype=np.int)#[[0 for x in range(7)] for y in range(7)]
+        self.classic_mode = classic_mode # True means classic, False means blitz
         self.sleep = sleep
         self.level = 1
-        self.pieces_left = 30
+        if self.classic_mode:
+            self.pieces_left = 30
+            self.level_up_bonus = 7000
+        else:
+            self.pieces_left = 5
+            self.level_up_bonus = 17000
         self.current_piece = random.randint(1, 9)
         self.points = 0
         self.game_over = False
@@ -89,8 +95,11 @@ class Game:
 
     def level_up(self):
         self.level += 1
-        self.pieces_left = max(31 - self.level, 5)
-        self.points += 7000
+        if self.classic_mode:
+            self.pieces_left = max(31 - self.level, 5)
+        else:
+            self.pieces_left = 5
+        self.points += self.level_up_bonus
         # first check if this will end the game
         self.overflow = np.copy(self.board[6])
         if self.overflow.max() != 0:
