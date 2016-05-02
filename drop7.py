@@ -66,17 +66,22 @@ class Game:
         # column is full
         if self.board[6][col] != 0:
             return False
+        # drop the piece until it hits another piece and stops
         for j in range(0, 7):
             if self.board[j][col] == 0:
                 self.board[j][col] = self.current_piece
                 break
+
         if self.print_board:
             print self.__str__()
         if self.sleep:
             time.sleep(1)
+
+        # count points for popping pieces
         point_counter = self.chain_points()
         pieces_popped = self.pop_pieces()
         self.points += pieces_popped * point_counter.next()
+        # continue the popping chain until nothing else will pop
         while pieces_popped > 0:
             if self.print_board:
                 print self.__str__()
@@ -85,7 +90,11 @@ class Game:
             pieces_popped = self.pop_pieces()
             self.points += pieces_popped * point_counter.next()
 
-        self.current_piece = random.choice([1, 2, 3, 4, 5, 6, 7, 9])
+        # set up for the next move
+        choices = range(1, 8)
+        if self.classic_mode:
+            choices.append(9)
+        self.current_piece = random.choice(choices)
         self.pieces_left -= 1
         if self.pieces_left == 0:
             self.level_up()
