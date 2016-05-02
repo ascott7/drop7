@@ -91,7 +91,10 @@ class Game:
             self.points += pieces_popped * point_counter.next()
 
         # set up for the next move
-        self.current_piece = random.choice([1, 2, 3, 4, 5, 6, 7, 9])
+        choices = range(1, 8)
+        if self.classic_mode:
+            choices.append(9)
+        self.current_piece = random.choice(choices)
         self.pieces_left -= 1
         if self.pieces_left == 0:
             self.level_up()
