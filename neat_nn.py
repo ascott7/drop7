@@ -77,16 +77,16 @@ def simulate_game(tup):
     return game.points
         
 def game_to_sit(game):
-    # 10 * 49 + 2 means 492 input nodes
-    """sit = []
+    # 10 * 49 + 3 means 493 input nodes
+    sit = []
     for row in game.board:
         for col in row:
             for i in range(col):
                 sit.append(0)
             sit.append(1)
             for i in range(9 - col):
-                sit.append(0)"""
-    sit = [item for sublist in game.board for item in sublist]
+                sit.append(0)
+    #sit = [item for sublist in game.board for item in sublist]
     sit.append(game.level)
     sit.append(game.pieces_left)
     sit.append(game.current_piece)
